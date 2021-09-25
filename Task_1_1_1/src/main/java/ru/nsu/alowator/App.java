@@ -1,20 +1,16 @@
 package ru.nsu.alowator;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class App {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        ArrayList<Integer> list = new ArrayList<>();
+        List<Integer> list = new ArrayList<>();
 
-        String inputLine = scanner.nextLine();
-        String[] splattedInputLine = inputLine.split("\\s+");
-
-        for (String intString : splattedInputLine) {
-            if (!intString.isEmpty()) {
-                list.add(Integer.parseInt(intString));
-            }
+        while (scanner.hasNextInt()) {
+            list.add(scanner.nextInt());
         }
 
         Integer[] arr = list.toArray(new Integer[0]);
