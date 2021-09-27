@@ -1,27 +1,26 @@
 package ru.nsu.alowator;
 
 import java.io.BufferedReader;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.*;
 
 public class TemplateIncludes {
 
-    private String template;
+    private String filename;
     private BufferedReader bufferedReader;
 
-    private List<Integer> includesIndexes;
-
-    public TemplateIncludes(String template, FileReader fileReader) {
-        this.template = template;
-        this.bufferedReader = new BufferedReader(fileReader);
-
-        this.includesIndexes = new ArrayList<>();
-        findIncludes();
+    public TemplateIncludes(String filename) {
+        this.filename = filename;
     }
 
-    private void findIncludes() {
-        includesIndexes.clear();
+    public List<Integer> findIncludes(String template) throws IOException {
+        bufferedReader = Files.newBufferedReader(Path.of(filename), StandardCharsets.UTF_8);
+        List<Integer> includesIndexes = new ArrayList<>();
         LinkedList<Character> text = new LinkedList<>();
         LinkedList<Integer> textZ = new LinkedList<>();
         int[] templateZ = zFunction(template);
@@ -30,7 +29,7 @@ public class TemplateIncludes {
         for (int i = 0; i < template.length(); i++) {
             symbol = getNextChar();
             if (symbol == -1)
-                return;
+                return includesIndexes;
             text.add((char) symbol);
             textZ.add(0);
         }
@@ -47,13 +46,15 @@ public class TemplateIncludes {
             }
 
             if (textZ.get(0) == template.length())
-                includesIndexes.add(i / 2);
+                includesIndexes.add(i);
 
             symbol = getNextChar();
             if (symbol == -1)
-                return;
+                return includesIndexes;
             text.removeFirst();
             text.addLast((char) symbol);
+            textZ.removeFirst();
+            textZ.addLast(0);
             i++;
         }
     }
@@ -82,10 +83,6 @@ public class TemplateIncludes {
             symbol = -1;
         }
         return symbol;
-    }
-
-    public List<Integer> getIncludesIndexes() {
-        return includesIndexes;
     }
 
 }
