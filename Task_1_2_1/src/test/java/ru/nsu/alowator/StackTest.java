@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 
@@ -12,6 +14,8 @@ class StackTest {
     class CustomClass{};
 
     Stack<Integer> integerStack;
+
+    final int bigTestArraySize = 1000000;
 
     @BeforeEach
     void stack_init() {
@@ -32,7 +36,6 @@ class StackTest {
 
     @Test
     void push_pop_bigInteger() {
-        final int bigTestArraySize = 1000000;
         Integer[] arr = new Integer[bigTestArraySize];
         for (int i = 0; i < arr.length; i++) {
             arr[i] = i * 3;
@@ -143,6 +146,23 @@ class StackTest {
     @Test
     void popStack_exception() {
         Assertions.assertThrows(NoSuchElementException.class, () -> {integerStack.popStack(-1);});
+    }
+
+
+    @Test
+    void foreach_integer() {
+        integerStack.push(8);
+        integerStack.push(0);
+        integerStack.push(-15);
+
+        Integer[] expected = {8, 0, -15};
+        List<Integer> actual = new ArrayList<>();
+
+        for (Integer x : integerStack) {
+            actual.add(x);
+        }
+
+        Assertions.assertArrayEquals(expected, actual.toArray());
     }
 
 }
