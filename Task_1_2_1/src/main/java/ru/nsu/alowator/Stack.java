@@ -2,9 +2,10 @@ package ru.nsu.alowator;
 
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public class Stack<T> {
+public class Stack<T> implements Iterable<T> {
 
     private int count = 0;
     private T[] arr;
@@ -60,4 +61,25 @@ public class Stack<T> {
             arr = Arrays.copyOf(arr, arr.length * ARR_MULTIPLIER);
         }
     }
+
+    @Override
+    public Iterator<T> iterator() {
+        return new Itr();
+    }
+
+    private class Itr implements Iterator<T> {
+        int cursor = 0;
+
+        @Override
+        public boolean hasNext() {
+            return cursor < count;
+        }
+
+        @Override
+        public T next() {
+            cursor += 1;
+            return arr[cursor - 1];
+        }
+    }
+
 }
