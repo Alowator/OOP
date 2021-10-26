@@ -25,7 +25,7 @@ class GradeBookTest {
     void setCurrentSemesterNumber_exceptionLess() {
         assertThrows(
                 RuntimeException.class,
-                () -> {gradeBook.setCurrentSemesterNumber(0);}
+                () -> gradeBook.setCurrentSemesterNumber(0)
         );
     }
 
@@ -33,7 +33,7 @@ class GradeBookTest {
     void setCurrentSemesterNumber_exceptionOver() {
         assertThrows(
                 RuntimeException.class,
-                () -> {gradeBook.setCurrentSemesterNumber(gradeBook.TOTAL_SEMESTERS_COUNT + 1);}
+                () -> gradeBook.setCurrentSemesterNumber(gradeBook.TOTAL_SEMESTERS_COUNT + 1)
         );
     }
 
@@ -54,7 +54,7 @@ class GradeBookTest {
 
     @Test
     void getAverageScore_empty() {
-        assertEquals(null, gradeBook.getAverageScore());
+        assertNull(gradeBook.getAverageScore());
     }
 
     @Test
