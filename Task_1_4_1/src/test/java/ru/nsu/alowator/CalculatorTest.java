@@ -93,13 +93,18 @@ class CalculatorTest {
     }
 
     @Test
-    void calculate_exception() {
+    void calculate_exceptionNotEnoughArgs() {
         assertThrows(ParseException.class, () -> Calculator.calculate("* 1 * 4"));
     }
 
     @Test
     void calculate_exceptionEmptyInput() {
         assertThrows(ParseException.class, () -> Calculator.calculate(""));
+    }
+
+    @Test
+    void calculate_exceptionUnknownOperation() {
+        assertThrows(ParseException.class, () -> Calculator.calculate("tg 10"));
     }
 
 }
