@@ -4,6 +4,11 @@ import ru.nsu.alowator.operation.*;
 
 public class OperationFactory {
 
+    /**
+     * Create new operation object by operation name.
+     * @param expr operation name
+     * @return new operation object
+     */
     public static Operation operation(String expr) {
         return switch (expr) {
             case "+" -> new Add();
