@@ -5,7 +5,10 @@ import ru.nsu.alowator.notebook.Note;
 import ru.nsu.alowator.notebook.Notebook;
 import ru.nsu.alowator.timer.Timer;
 
+import java.security.KeyPair;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -35,21 +38,29 @@ class NotebookTest {
 
     @Test
     void add() {
-        notebook.add("vary useful1");
-        notebook.add("roflokek");
+        List<List<String>> values = new ArrayList<>();
+        values.add(List.of("Task1", "Complete OOP homework"));
+        values.add(List.of("Task2", "Sleep"));
+        for (List<String> value : values) {
+            notebook.add(value.get(0), value.get(1));
+        }
 
         List<Note> notes = notebook.getNotesSortedByDate();
 
-        Assertions.assertEquals("vary useful1", notes.get(0).getText());
-        Assertions.assertEquals(timer.time - 1, notes.get(0).getDatetime().getTime());
-        Assertions.assertEquals("roflokek", notes.get(1).getText());
-        Assertions.assertEquals(timer.time, notes.get(1).getDatetime().getTime());
+        for (int i = 0; i < values.size(); i++) {
+            Assertions.assertEquals(values.get(i).get(0), notes.get(i).getName());
+            Assertions.assertEquals(values.get(i).get(1), notes.get(i).getText());
+            Assertions.assertEquals(
+                    timer.time - values.size() + i + 1,
+                    notes.get(i).getDatetime().getTime()
+            );
+        }
     }
 
     @Test
     void remove() {
-        notebook.add("vary useful1");
-        notebook.remove("vary useful1");
+        notebook.add("Task1", "Complete OOP homework");
+        notebook.remove("Task1");
 
         List<Note> notes = notebook.getNotesSortedByDate();
 

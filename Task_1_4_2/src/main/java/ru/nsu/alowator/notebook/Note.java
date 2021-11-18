@@ -4,12 +4,18 @@ import java.util.Date;
 
 public class Note {
 
+    private String name;
     private String text;
     private Date datetime;
 
-    public Note(String text, Date datetime) {
+    public Note(String name, String text, Date datetime) {
+        this.name = name;
         this.text = text;
         this.datetime = datetime;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public String getText() {

@@ -14,13 +14,13 @@ public class Notebook {
         this.notes = new ArrayList<>();
     }
 
-    public void add(String text) {
-        Note note = new Note(text, timer.getCurrentDateTime());
+    public void add(String name, String text) {
+        Note note = new Note(name, text, timer.getCurrentDateTime());
         notes.add(note);
     }
 
     public void remove(String text) {
-        notes.removeIf(note -> Objects.equals(note.getText(), text));
+        notes.removeIf(note -> Objects.equals(note.getName(), text));
     }
 
     public List<Note> getNotesSortedByDate() {
