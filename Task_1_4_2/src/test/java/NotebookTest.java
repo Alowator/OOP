@@ -1,4 +1,3 @@
-import com.google.gson.Gson;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -6,7 +5,6 @@ import ru.nsu.alowator.notebook.Note;
 import ru.nsu.alowator.notebook.Notebook;
 import ru.nsu.alowator.timer.Timer;
 
-import javax.swing.plaf.IconUIResource;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -14,7 +12,7 @@ import java.util.List;
 
 class NotebookTest {
 
-    class MockTimer implements Timer {
+    static class MockTimer implements Timer {
 
         public long time = 23490234;
 
@@ -117,14 +115,11 @@ class NotebookTest {
             timer.time += 1;
         }
 
-        List<Note> notes = notebook.getNotesSortedByDate();
-
         String jsonNotebook = notebook.toJson();
-        System.out.println(jsonNotebook);
-
         Notebook newNotebook = new Notebook(timer, jsonNotebook);
-        System.out.println(newNotebook.toJson());
 
+        Assertions.assertEquals(jsonNotebook, newNotebook.toJson());
+        Assertions.assertArrayEquals(notebook.getNotesSortedByDate().toArray(), newNotebook.getNotesSortedByDate().toArray());
     }
 
 
