@@ -3,9 +3,7 @@ package ru.nsu.alowator.notebook;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-
-import com.google.gson.Gson;
+import java.util.Objects;
 
 public class Note {
 
@@ -53,4 +51,18 @@ public class Note {
         SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy kk:mm");
         return name + " (" + formatter.format(datetime) + "):\n" + text;
     }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+        Note note = (Note) obj;
+        return Objects.equals(name, note.name) &&
+                Objects.equals(text, note.text) &&
+                Objects.equals(datetime.toString(), note.datetime.toString());
+    }
+
 }
