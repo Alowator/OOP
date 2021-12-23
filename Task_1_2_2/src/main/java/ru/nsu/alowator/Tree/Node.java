@@ -7,8 +7,8 @@ public class Node {
 
     private final Object object;
 
-    Node parent = null;
-    List<Node> children;
+    private Node parent = null;
+    private final List<Node> children;
 
     public Node(Object object) {
         this.object = object;
@@ -30,5 +30,9 @@ public class Node {
 
     public Object getObject() {
         return object;
+    }
+
+    public List<Node> getChildren() {
+        return children;
     }
 }
