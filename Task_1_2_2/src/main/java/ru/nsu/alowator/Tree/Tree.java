@@ -4,18 +4,18 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-public class Tree<T> implements Collection<Object> {
+public class Tree<T> implements Collection<T> {
 
     private Node root = null;
-    private final Map<Object, Node> map;
+    private final Map<Object, Node> objectToNodeReflection;
 
     Tree() {
-        map = new HashMap<>();
+        objectToNodeReflection = new HashMap<>();
     }
 
     @Override
     public int size() {
-        return map.size();
+        return objectToNodeReflection.size();
     }
 
     @Override
@@ -25,7 +25,15 @@ public class Tree<T> implements Collection<Object> {
 
     @Override
     public boolean contains(Object o) {
-        return map.containsKey(o);
+        return objectToNodeReflection.containsKey(o);
+    }
+
+    @Override
+    public boolean containsAll(@NotNull Collection c) {
+        for (Object o : c)
+            if (!contains(o))
+                return false;
+        return true;
     }
 
     @Override
@@ -35,7 +43,7 @@ public class Tree<T> implements Collection<Object> {
 
         if (root == null) {
             root = new Node(value);
-            map.put(value, root);
+            objectToNodeReflection.put(value, root);
             return true;
         }
         addAfter(root, value);
@@ -46,19 +54,19 @@ public class Tree<T> implements Collection<Object> {
         if (contains(value) || !contains(parent))
             return false;
 
-        Node parentNote = map.get(parent);
+        Node parentNote = objectToNodeReflection.get(parent);
         addAfter(parentNote, value);
         return true;
     }
 
     private void addAfter(@NotNull Node node, Object value) {
         Node newNode = new Node(value);
-        map.put(value, newNode);
+        objectToNodeReflection.put(value, newNode);
         node.addChild(newNode);
     }
 
     @Override
-    public boolean addAll(@NotNull Collection<?> c) {
+    public boolean addAll(Collection<? extends T> c) {
         boolean isModified = false;
         for (Object o : c) {
             isModified |= add(o);
@@ -71,11 +79,11 @@ public class Tree<T> implements Collection<Object> {
         if (!contains(o))
             return false;
 
-        Node nodeToRemove = map.get(o);
+        Node nodeToRemove = objectToNodeReflection.get(o);
         if (nodeToRemove == root) {
-            if (!nodeToRemove.children.isEmpty()) {
-                Node newRoot = nodeToRemove.children.get(0);
-                for (Node node : nodeToRemove.children) {
+            if (!nodeToRemove.getChildren().isEmpty()) {
+                Node newRoot = nodeToRemove.getChildren().get(0);
+                for (Node node : nodeToRemove.getChildren()) {
                     if (node == newRoot)
                         continue;
                     newRoot.addChild(node);
@@ -87,7 +95,7 @@ public class Tree<T> implements Collection<Object> {
         }
 
         nodeToRemove.remove();
-        map.remove(o);
+        objectToNodeReflection.remove(o);
         return true;
     }
 
@@ -103,7 +111,7 @@ public class Tree<T> implements Collection<Object> {
     @Override
     public void clear() {
         root = null;
-        map.clear();
+        objectToNodeReflection.clear();
     }
 
     @Override
@@ -118,21 +126,15 @@ public class Tree<T> implements Collection<Object> {
     }
 
     @Override
-    public boolean containsAll(@NotNull Collection c) {
-        for (Object o : c)
-            if (!contains(o))
-                return false;
-        return true;
-    }
-
-    @Override
     public Object[] toArray() {
-        List<Object> list = new ArrayList<>(this);
+        List<T> list = new ArrayList<>();
+        for (T x : this) {
+            list.add(x);
+        }
         return list.toArray();
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public <T1> T1[] toArray(T1[] a) {
         int size = size();
         T1[] array = (T1[]) toArray();
@@ -146,11 +148,11 @@ public class Tree<T> implements Collection<Object> {
     }
 
     @Override
-    public Iterator iterator() {
+    public Iterator<T> iterator() {
         return new ObjectBfsIterator();
     }
 
-    private class ObjectBfsIterator implements Iterator<Object> {
+    private class ObjectBfsIterator implements Iterator<T> {
         NodeBfsIterator it;
 
         ObjectBfsIterator() {
@@ -163,8 +165,8 @@ public class Tree<T> implements Collection<Object> {
         }
 
         @Override
-        public Object next() {
-            return it.next().getObject();
+        public T next() {
+            return (T) it.next().getObject();
         }
     }
 
@@ -184,7 +186,7 @@ public class Tree<T> implements Collection<Object> {
         @Override
         public Node next() {
             Node node = deque.removeFirst();
-            for (Node child : node.children) {
+            for (Node child : node.getChildren()) {
                 deque.addLast(child);
             }
             return node;
