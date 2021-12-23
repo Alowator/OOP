@@ -138,28 +138,27 @@ class TreeTest {
     @Test
     void toArray() {
         tree.addAll(values);
-        String[] arr = new String[]{"A", "B", "C"};
-        assertArrayEquals(arr, tree.toArray());
+        String[] expected = new String[]{"A", "B", "C"};
+        assertArrayEquals(expected, tree.toArray());
     }
 
     @Test
     void toArrayA() {
         tree.addAll(values);
-        String[] arr = new String[]{"A", "B", "C"};
+        String[] expected = new String[]{"A", "B", "C"};
 
         String[] newArr = new String[]{};
 
-        assertArrayEquals(arr, tree.toArray(newArr));
+        assertArrayEquals(expected, tree.toArray(newArr));
     }
 
     @Test
     void toArrayA_large() {
         tree.addAll(values);
-        String[] arr = new String[]{"A", "B", "C"};
 
-        String[] newArr = new String[10];
+        String[] arr = new String[10];
 
-        assertArrayEquals(newArr, tree.toArray(newArr));
+        assertArrayEquals(arr, tree.toArray(arr));
     }
 
     @Test
