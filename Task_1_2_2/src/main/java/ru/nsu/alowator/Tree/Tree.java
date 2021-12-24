@@ -6,14 +6,14 @@ import java.util.*;
 
 public class Tree<T> implements Collection<T> {
 
-    private Node root = null;
-    private final Map<Object, Node> objectToNodeReflection;
+    private Node<T> root = null;
+    private final Map<T, Node<T>> valueToNodeReflection;
 
     /**
      * Constructs an empty tree.
      */
     Tree() {
-        objectToNodeReflection = new HashMap<>();
+        valueToNodeReflection = new HashMap<>();
     }
 
     /**
@@ -23,7 +23,7 @@ public class Tree<T> implements Collection<T> {
      */
     @Override
     public int size() {
-        return objectToNodeReflection.size();
+        return valueToNodeReflection.size();
     }
 
     /**
@@ -44,7 +44,7 @@ public class Tree<T> implements Collection<T> {
      */
     @Override
     public boolean contains(Object o) {
-        return objectToNodeReflection.containsKey(o);
+        return valueToNodeReflection.containsKey(o);
     }
 
     /**
@@ -62,6 +62,34 @@ public class Tree<T> implements Collection<T> {
     }
 
     /**
+     * Returns subtree of this tree.
+     *
+     * @param baseElement root of the new tree
+     * @return {@code null} if this tree contains no {@code baseElement}
+     */
+    public Tree<T> getSubtree(T baseElement) {
+        if (!contains(baseElement)) {
+            return null;
+        }
+
+        Tree<T> newTree = new Tree<>();
+
+        Node<T> node = valueToNodeReflection.get(baseElement);
+        NodeBfsIterator it = new NodeBfsIterator(node);
+        while (it.hasNext()) {
+            node = it.next();
+            if (newTree.root == null) {
+                newTree.add(node.getValue());
+            }
+            for (Node<T> child : node.getChildren()) {
+                newTree.add(node.getValue(), child.getValue());
+            }
+        }
+
+        return newTree;
+    }
+
+    /**
      * Appends the specified element to this tree.
      * If this tree {@code isEmpty()}, element will be root.
      * Else specified element will be son of the root.
@@ -70,13 +98,13 @@ public class Tree<T> implements Collection<T> {
      * @return {@code true} (as specified by {@link Collection#add})
      */
     @Override
-    public boolean add(Object value) {
+    public boolean add(T value) {
         if (contains(value))
             return false;
 
         if (root == null) {
-            root = new Node(value);
-            objectToNodeReflection.put(value, root);
+            root = new Node<>(value);
+            valueToNodeReflection.put(value, root);
             return true;
         }
         addAfter(root, value);
@@ -90,18 +118,18 @@ public class Tree<T> implements Collection<T> {
      * @param value element to be added to this tree
      * @return {@code true} (as specified by {@link Collection#add})
      */
-    public boolean add(Object parent, Object value) {
+    public boolean add(T parent, T value) {
         if (contains(value) || !contains(parent))
             return false;
 
-        Node parentNote = objectToNodeReflection.get(parent);
+        Node<T> parentNote = valueToNodeReflection.get(parent);
         addAfter(parentNote, value);
         return true;
     }
 
-    private void addAfter(@NotNull Node node, Object value) {
-        Node newNode = new Node(value);
-        objectToNodeReflection.put(value, newNode);
+    private void addAfter(@NotNull Node<T> node, T value) {
+        Node<T> newNode = new Node<>(value);
+        valueToNodeReflection.put(value, newNode);
         node.addChild(newNode);
     }
 
@@ -116,7 +144,7 @@ public class Tree<T> implements Collection<T> {
     @Override
     public boolean addAll(Collection<? extends T> c) {
         boolean isModified = false;
-        for (Object o : c) {
+        for (T o : c) {
             isModified |= add(o);
         }
         return isModified;
@@ -133,11 +161,11 @@ public class Tree<T> implements Collection<T> {
         if (!contains(o))
             return false;
 
-        Node nodeToRemove = objectToNodeReflection.get(o);
+        Node<T> nodeToRemove = valueToNodeReflection.get(o);
         if (nodeToRemove == root) {
             if (!nodeToRemove.getChildren().isEmpty()) {
-                Node newRoot = nodeToRemove.getChildren().get(0);
-                for (Node node : nodeToRemove.getChildren()) {
+                Node<T> newRoot = nodeToRemove.getChildren().get(0);
+                for (Node<T> node : nodeToRemove.getChildren()) {
                     if (node == newRoot)
                         continue;
                     newRoot.addChild(node);
@@ -149,7 +177,7 @@ public class Tree<T> implements Collection<T> {
         }
 
         nodeToRemove.remove();
-        objectToNodeReflection.remove(o);
+        valueToNodeReflection.remove(o);
         return true;
     }
 
@@ -176,7 +204,7 @@ public class Tree<T> implements Collection<T> {
     @Override
     public void clear() {
         root = null;
-        objectToNodeReflection.clear();
+        valueToNodeReflection.clear();
     }
 
     /**
@@ -247,14 +275,14 @@ public class Tree<T> implements Collection<T> {
      */
     @Override
     public Iterator<T> iterator() {
-        return new ObjectBfsIterator();
+        return new ValueBfsIterator();
     }
 
-    private class ObjectBfsIterator implements Iterator<T> {
+    private class ValueBfsIterator implements Iterator<T> {
         NodeBfsIterator it;
 
-        ObjectBfsIterator() {
-            it = new NodeBfsIterator();
+        ValueBfsIterator() {
+            it = new NodeBfsIterator(root);
         }
 
         @Override
@@ -264,16 +292,18 @@ public class Tree<T> implements Collection<T> {
 
         @Override
         public T next() {
-            return (T) it.next().getObject();
+            return it.next().getValue();
         }
     }
 
-    private class NodeBfsIterator implements Iterator<Node> {
-        Deque<Node> deque;
+    private class NodeBfsIterator implements Iterator<Node<T>> {
+        Deque<Node<T>> deque;
 
-        NodeBfsIterator() {
+        NodeBfsIterator(Node<T> baseNode) {
             deque = new ArrayDeque<>();
-            deque.addLast(root);
+            if (baseNode != null) {
+                deque.addLast(baseNode);
+            }
         }
 
         @Override
@@ -282,9 +312,9 @@ public class Tree<T> implements Collection<T> {
         }
 
         @Override
-        public Node next() {
-            Node node = deque.removeFirst();
-            for (Node child : node.getChildren()) {
+        public Node<T> next() {
+            Node<T> node = deque.removeFirst();
+            for (Node<T> child : node.getChildren()) {
                 deque.addLast(child);
             }
             return node;

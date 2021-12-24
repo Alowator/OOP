@@ -61,6 +61,32 @@ class TreeTest {
     }
 
     @Test
+    void getSubtree() {
+        tree.add("A");
+        tree.add("A", "B");
+        tree.add("A", "C");
+        tree.add("B", "D");
+        tree.add("B", "E");
+
+        Tree<String> newTree = tree.getSubtree("B");
+
+        assertTrue(newTree.contains("B"));
+        assertTrue(newTree.contains("D"));
+        assertTrue(newTree.contains("E"));
+        assertFalse(newTree.contains("A"));
+        assertFalse(newTree.contains("C"));
+
+    }
+
+    @Test
+    void getSubtree_null() {
+        tree.add("A");
+
+        assertNull(tree.getSubtree("B"));
+
+    }
+
+    @Test
     void add() {
         tree.add("A");
         assertTrue(tree.contains("A"));
