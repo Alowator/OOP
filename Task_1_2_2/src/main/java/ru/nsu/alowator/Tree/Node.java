@@ -3,36 +3,36 @@ package ru.nsu.alowator.Tree;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Node {
+public class Node<T> {
 
-    private final Object object;
+    private final T value;
 
-    private Node parent = null;
-    private final List<Node> children;
+    private Node<T> parent = null;
+    private final List<Node<T>> children;
 
-    public Node(Object object) {
-        this.object = object;
+    public Node(T value) {
+        this.value = value;
         this.children = new ArrayList<>();
     }
 
-    public void addChild(Node node) {
+    public void addChild(Node<T> node) {
         children.add(node);
         node.parent = this;
     }
 
     public void remove() {
         if (this.parent != null) {
-            for (Node child : children) {
+            for (Node<T> child : children) {
                 this.parent.addChild(child);
             }
         }
     }
 
-    public Object getObject() {
-        return object;
+    public T getValue() {
+        return value;
     }
 
-    public List<Node> getChildren() {
+    public List<Node<T>> getChildren() {
         return children;
     }
 }
