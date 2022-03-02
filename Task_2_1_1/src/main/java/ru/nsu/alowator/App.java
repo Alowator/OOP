@@ -3,17 +3,24 @@ package ru.nsu.alowator;
 
 import ru.nsu.alowator.impl.*;
 
+import java.util.Arrays;
+
 public class App {
 
-    final private static int ARRAY_SIZE = 1000000;
+    final private static int ARRAY_SIZE = 3000;
 
-    public static void main(String[] args)  {
+    public static void main(String[] args) throws Exception {
         Integer[] array = new Integer[ARRAY_SIZE];
         fillArrayWithPrimePositiveNumbers(array);
 
         NotPrimeFinder[] findersToMeasure = new NotPrimeFinder[]{
                 new NotPrimeFinder(array),
-                new ParallelStreamNotPrimeFinder(array)
+                new ParallelStreamNotPrimeFinder(array),
+                new ThreadNotPrimeFinder(array, 1),
+                new ThreadNotPrimeFinder(array, 2),
+                new ThreadNotPrimeFinder(array, 4),
+                new ThreadNotPrimeFinder(array, 8),
+                new ThreadNotPrimeFinder(array, 16),
         };
 
         Runner runner = new Runner(findersToMeasure);
@@ -22,18 +29,7 @@ public class App {
     }
 
     private static void fillArrayWithPrimePositiveNumbers(Integer[] array) {
-        int candidate = 2;
-        for (int i = 0; i < array.length; i++) {
-            while (!Calculus.isPrime(candidate)) {
-                candidate++;
-                if (candidate < 2)
-                    candidate = 2;
-            }
-            array[i] = candidate;
-            candidate++;
-            if (candidate < 2)
-                candidate = 2;
-        }
+        Arrays.fill(array, 2147483647);
     }
 
 }

@@ -10,7 +10,7 @@ public class ParallelStreamNotPrimeFinder extends NotPrimeFinder {
     }
 
     @Override
-    public boolean run() {
-        return Arrays.stream(array).parallel().noneMatch(Calculus::isPrime);
+    public Boolean call() {
+        return !Arrays.stream(array).parallel().allMatch(Calculus::isPrime);
     }
 }

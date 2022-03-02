@@ -2,7 +2,9 @@ package ru.nsu.alowator.impl;
 
 import ru.nsu.alowator.Calculus;
 
-public class NotPrimeFinder {
+import java.util.concurrent.Callable;
+
+public class NotPrimeFinder implements Callable<Boolean> {
 
     protected final Integer[] array;
 
@@ -10,11 +12,17 @@ public class NotPrimeFinder {
         this.array = array;
     }
 
-    public boolean run() {
+    @Override
+    public Boolean call() {
         for (Integer x : array) {
             if (!Calculus.isPrime(x))
                 return true;
         }
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName();
     }
 }
