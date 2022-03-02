@@ -10,16 +10,30 @@ public class ThreadNotPrimeFinder extends NotPrimeFinder {
 
     private final int threadsCount;
 
+    /**
+     * Implementation using Thread(),
+     * by default use {@value DEFAULT_THREADS_COUNT} threads,
+     * extends {@link NotPrimeFinder#NotPrimeFinder(Integer[])}
+     */
     public ThreadNotPrimeFinder(Integer[] array) {
         super(array);
         this.threadsCount = DEFAULT_THREADS_COUNT;
     }
 
+    /**
+     * Implementation using Thread().
+     * extends {@link NotPrimeFinder#NotPrimeFinder(Integer[])}
+     *
+     * @param threadsCount count of threads involved
+     */
     public ThreadNotPrimeFinder(Integer[] array, int threadsCount) {
         super(array);
         this.threadsCount = threadsCount;
     }
 
+    /**
+     * {@link NotPrimeFinder#call()}
+     */
     @Override
     public Boolean call() {
         Boolean result = null;
