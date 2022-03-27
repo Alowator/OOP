@@ -1,0 +1,12 @@
+[
+  {
+    "id": 0,
+    "name": "Andrew",
+    "trunkSize": 3
+  },
+  {
+    "id": 1,
+    "name": "CJ",
+    "trunkSize": 1
+  }
+]
