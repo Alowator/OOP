@@ -4,25 +4,31 @@ import ru.nsu.alowator.pizzeria.employees.Baker;
 import ru.nsu.alowator.storage.entities.BakerEntity;
 import ru.nsu.alowator.storage.entities.CourierEntity;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.logging.Logger;
 
 public class Pizzeria {
     private final Logger log;
     private final Queue<Order> orders;
+    private final List<Thread> bakerThreads;
 
     private final Warehouse warehouse;
 
     public Pizzeria(int warehouseCapacity, Logger log) {
         this.log = log;
         this.orders = new LinkedList<>();
+        this.bakerThreads = new ArrayList<>();
         this.warehouse = new Warehouse(warehouseCapacity, log);
     }
 
     public void addBaker(BakerEntity entity) {
         Baker baker = new Baker(this, entity);
-        new Thread(baker).start();
+        Thread bakerThread = new Thread(baker);
+        bakerThreads.add(bakerThread);
+        bakerThread.start();
     }
 
     public void addCourier(CourierEntity courierEntity) {
