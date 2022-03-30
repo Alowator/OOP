@@ -4,6 +4,8 @@ import ru.nsu.alowator.pizzeria.Order;
 import ru.nsu.alowator.pizzeria.Warehouse;
 import ru.nsu.alowator.storage.entities.CourierEntity;
 
+import java.util.List;
+
 import static java.lang.Thread.sleep;
 
 public class Courier implements Runnable {
@@ -18,8 +20,8 @@ public class Courier implements Runnable {
     @Override
     public void run() {
         while (true) {
-            Order order = warehouse.takePizza();
-            ship(order);
+            List<Order> orders = warehouse.takePizzas(entity.getTrunkSize());
+            orders.forEach(this::ship);
         }
     }
 

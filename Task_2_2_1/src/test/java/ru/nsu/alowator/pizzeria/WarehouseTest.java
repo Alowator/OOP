@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import ru.nsu.alowator.storage.entities.CourierEntity;
 
 import java.io.IOException;
+import java.util.List;
 
 import static java.lang.Thread.sleep;
 import static org.junit.jupiter.api.Assertions.*;
@@ -42,13 +43,13 @@ class WarehouseTest extends BaseLoggingTest {
     }
 
     @Test
-    void takePizza() {
-        String name = "pizza";
-        warehouse.addPizza(new Order(name));
+    void takePizzas() {
+        warehouse.addPizza(new Order("pizza1"));
+        warehouse.addPizza(new Order("pizza2"));
 
-        Order order = warehouse.takePizza();
-
-        assertEquals(name, order.pizzaName());
+        List<Order> orders = warehouse.takePizzas(2);
+        assertEquals("pizza1", orders.get(0).pizzaName());
+        assertEquals("pizza2", orders.get(1).pizzaName());
     }
 
     @Test

@@ -44,7 +44,7 @@ public class Warehouse {
         }
     }
 
-    public Order takePizza() {
+    public List<Order> takePizzas(int maxCount) {
         synchronized (pizzas) {
             while (pizzas.isEmpty()) {
                 try {
@@ -54,7 +54,12 @@ public class Warehouse {
                 }
             }
             pizzas.notify();
-            return pizzas.poll();
+
+            List<Order> pizzasToDelivery = new ArrayList<>();
+            while (pizzasToDelivery.size() < maxCount && !pizzas.isEmpty()) {
+                pizzasToDelivery.add(pizzas.poll());
+            }
+            return pizzasToDelivery;
         }
     }
 
