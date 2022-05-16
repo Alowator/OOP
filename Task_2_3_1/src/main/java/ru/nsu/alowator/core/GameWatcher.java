@@ -1,5 +1,7 @@
 package ru.nsu.alowator.core;
 
 public interface GameWatcher {
-    void updateGrid(Grid grid);
+    void updateFrame(Grid grid, Snake snake);
+    void gameOver();
+    void gameWin();
 }
