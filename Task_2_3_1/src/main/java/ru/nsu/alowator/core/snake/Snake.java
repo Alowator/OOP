@@ -1,27 +1,35 @@
-package ru.nsu.alowator.core;
+package ru.nsu.alowator.core.snake;
+
+import ru.nsu.alowator.core.Cell;
+import ru.nsu.alowator.core.Grid;
 
 import java.util.LinkedList;
 import java.util.stream.Stream;
 
 public class Snake {
+    private final Grid grid;
     private final LinkedList<Cell> snakeBody = new LinkedList<>();
     private Direction direction;
     private Direction directionOrder;
     private int growthPotential;
 
 
-    public Snake(Cell startCell) {
-        snakeBody.add(startCell);
+    public Snake(Grid grid) {
+        this.grid = grid;
+        snakeBody.add(grid.getRandomFreeCell());
         direction = Direction.RIGHT;
         growthPotential = 0;
         directionOrder = null;
     }
 
-    public void move(int rowCount, int colCount) {
+    public void move() {
         if (directionOrder != null) {
             direction = directionOrder;
             directionOrder = null;
         }
+
+        int rowCount = grid.getRowCount();
+        int colCount = grid.getColCount();
 
         int newRow = snakeBody.getLast().getRow();
         int newCol = snakeBody.getLast().getCol();
@@ -32,7 +40,7 @@ public class Snake {
             case LEFT -> newCol = (colCount + newCol - 1) % colCount;
         }
 
-        snakeBody.add(new Cell(newRow, newCol, Cell.Type.FOOD));
+        snakeBody.add(grid.getCell(newRow, newCol));
         if (growthPotential > 0)
             growthPotential -= 1;
         else

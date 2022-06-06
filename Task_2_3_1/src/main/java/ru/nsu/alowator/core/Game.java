@@ -1,23 +1,28 @@
 package ru.nsu.alowator.core;
 
+import ru.nsu.alowator.core.snake.Direction;
+import ru.nsu.alowator.core.snake.Snake;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class Game implements Runnable {
-    private final int DEFAULT_RAW_COUNT = 20;
-    private final int DEFAULT_COL_COUNT = 30;
-    private final int DEFAULT_FOOD_COUNT = 30;
-    private final int DEFAULT_WALLS_COUNT = 5;
-    private final int WIN_SIZE = 100;
 
     private final GameWatcher watcher;
     private final Grid grid;
     private final Snake snake;
+    private final Enemies enemies;
+    private final int winSize;
 
     private final Thread gameThread;
 
-    public Game(GameWatcher watcher) {
-        this.grid = new Grid(DEFAULT_RAW_COUNT, DEFAULT_COL_COUNT, DEFAULT_FOOD_COUNT, DEFAULT_WALLS_COUNT);
-        this.snake = new Snake(new Cell(2, 2));
+    public Game(GameWatcher watcher, int rowCount, int colCount, int foodCount, int wallsCount, int winSize, int enemiesCount) {
+        this.grid = new Grid(rowCount, colCount, foodCount, wallsCount);
+        this.snake = new Snake(grid);
+        this.enemies = new Enemies(grid, enemiesCount);
+
+        this.winSize = winSize;
         this.watcher = watcher;
         gameThread = new Thread(this);
         gameThread.start();
@@ -25,18 +30,17 @@ public class Game implements Runnable {
 
     @Override
     public void run() {
-        long lastFrameUpdateTime = 0;
         long lastSnakeMoveTime = 0;
         while (true) {
-            if (System.currentTimeMillis() - lastFrameUpdateTime >= 20) {
-                lastFrameUpdateTime = System.currentTimeMillis();
-                watcher.updateFrame(grid, snake);
-            }
             if (System.currentTimeMillis() - lastSnakeMoveTime >= 100) {
                 lastSnakeMoveTime = System.currentTimeMillis();
-                snake.move(grid.getRowCount(), grid.getColCount());
+                snake.move();
+                enemies.updateStrategy();
+                enemies.stream().forEach(Snake::move);
+                watcher.updateFrame(grid, snake, enemies.stream().toList());
                 checkFoodCollision();
                 checkSnakeCollision();
+                checkWallCollision();
                 checkSnakeSize();
             }
 
@@ -64,22 +68,20 @@ public class Game implements Runnable {
     }
 
     private void gameOver() {
-        watcher.updateFrame(grid, snake);
         watcher.gameOver();
         gameThread.interrupt();
     }
 
     private void gameWin() {
-        watcher.updateFrame(grid, snake);
         watcher.gameWin();
         gameThread.interrupt();
     }
 
     private void checkFoodCollision() {
-        Cell currentCell = grid.getCell(snake.head().getRow(), snake.head().getCol());
-        if (currentCell.getType() == Cell.Type.FOOD) {
+        Cell headCell = snake.head();
+        if (headCell.getType() == Cell.Type.FOOD) {
             snake.grow();
-            grid.exchangeCellType(currentCell.getRow(), currentCell.getCol(), Cell.Type.EMPTY);
+            grid.exchangeCellType(headCell.getRow(), headCell.getCol(), Cell.Type.EMPTY);
             grid.addFood(1);
         }
     }
@@ -87,14 +89,22 @@ public class Game implements Runnable {
     private void checkSnakeCollision() {
         Cell headCell = snake.head();
         snake.stream().forEach(bodyCell -> {
-            if (headCell.isIntersect(bodyCell) && bodyCell != snake.head()) {
+            System.out.println(bodyCell);
+            if (bodyCell.isIntersect(headCell) && bodyCell != headCell) {
                 gameOver();
             }
         });
     }
 
+    private void checkWallCollision() {
+        Cell headCell = snake.head();
+        if (headCell.getType() == Cell.Type.WALL) {
+            gameOver();
+        }
+    }
+
     private void checkSnakeSize() {
-        if (snake.size() >= WIN_SIZE) {
+        if (snake.size() >= winSize) {
             gameWin();
         }
     }
