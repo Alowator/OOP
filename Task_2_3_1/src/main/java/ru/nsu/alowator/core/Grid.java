@@ -30,7 +30,7 @@ public class Grid {
 
     public void addFood(int foodCount) {
         while (foodCount > 0 && !emptyCells.isEmpty()) {
-            Cell nextFoodCell = emptyCells.remove(ThreadLocalRandom.current().nextInt(emptyCells.size()));
+            Cell nextFoodCell = getRandomFreeCell();
             exchangeCellType(nextFoodCell.getRow(), nextFoodCell.getCol(), Cell.Type.FOOD);
             foodCount -= 1;
         }
@@ -39,19 +39,10 @@ public class Grid {
     public void addWall(int wallCount) {
         while (wallCount > 0 && !emptyCells.isEmpty()) {
             int wallCellsCount = 5;
-            Cell nextWalCell = emptyCells.remove(ThreadLocalRandom.current().nextInt(emptyCells.size()));
+            Cell nextWalCell = getRandomFreeCell();
             exchangeCellType(nextWalCell.getRow(), nextWalCell.getCol(), Cell.Type.WALL);
-            addWallPiece(nextWalCell, wallCellsCount - 1);
             wallCount -= 1;
         }
-    }
-
-    private void addWallPiece(Cell wall, int count) {
-//        while (count > 0) {
-//            List<Integer[]> diffs = new ArrayList<>(){{1, 1}, {1, 0}};
-//            Collections.shuffle(diffs);
-//            count -= 1;
-//        }
     }
 
     public void exchangeCellType(int row, int col, Cell.Type type) {
@@ -63,6 +54,10 @@ public class Grid {
         cells[row][col] = newCell;
         if (newCell.getType() == Cell.Type.EMPTY)
             emptyCells.add(newCell);
+    }
+
+    public Cell getRandomFreeCell() {
+        return emptyCells.remove(ThreadLocalRandom.current().nextInt(emptyCells.size()));
     }
 
     public int getColCount() {

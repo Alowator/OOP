@@ -1,4 +1,4 @@
-package ru.nsu.alowator.core;
+package ru.nsu.alowator.core.snake;
 
 public enum Direction {
     UP,
