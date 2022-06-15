@@ -2,11 +2,7 @@ package ru.nsu.alowator;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-import ru.nsu.alowator.controller.Main;
 
 import java.io.IOException;
 

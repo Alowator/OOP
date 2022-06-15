@@ -11,4 +11,8 @@ module ru.nsu.alowator {
     opens ru.nsu.alowator.view to javafx.fxml;
     exports ru.nsu.alowator.core;
     opens ru.nsu.alowator.core to javafx.fxml;
+    exports ru.nsu.alowator.core.entities;
+    opens ru.nsu.alowator.core.entities to javafx.fxml;
+    exports ru.nsu.alowator.core.frame;
+    opens ru.nsu.alowator.core.frame to javafx.fxml;
 }

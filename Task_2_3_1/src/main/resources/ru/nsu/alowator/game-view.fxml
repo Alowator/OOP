@@ -17,7 +17,7 @@
     </top>
     <center>
         <HBox fx:id="mainBox" BorderPane.alignment="CENTER">
-<!--            <Canvas fx:id="canvas" focusTraversable="true" onKeyPressed="#keyHandler"/>-->
+            <Canvas fx:id="canvas" focusTraversable="true" onKeyPressed="#keyHandler"/>
         </HBox>
     </center>
 </BorderPane>

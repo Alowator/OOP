@@ -1,111 +1,119 @@
 package ru.nsu.alowator.core;
 
-import ru.nsu.alowator.core.snake.Direction;
-import ru.nsu.alowator.core.snake.Snake;
+import ru.nsu.alowator.core.entities.*;
+import ru.nsu.alowator.core.frame.Frame;
+import ru.nsu.alowator.core.frame.Status;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
+import java.util.Collections;
 
-public class Game implements Runnable {
-
-    private final GameWatcher watcher;
+public class Game {
+    private final View view;
     private final Grid grid;
-    private final Snake snake;
+    private final Snake player;
     private final Enemies enemies;
     private final int winSize;
+    private Status status;
 
-    private final Thread gameThread;
-
-    public Game(GameWatcher watcher, int rowCount, int colCount, int foodCount, int wallsCount, int winSize, int enemiesCount) {
+    public Game(View view, int rowCount, int colCount, int foodCount, int wallsCount, int winSize, int enemiesCount) {
         this.grid = new Grid(rowCount, colCount, foodCount, wallsCount);
-        this.snake = new Snake(grid);
+        this.player = new Snake(grid);
         this.enemies = new Enemies(grid, enemiesCount);
 
         this.winSize = winSize;
-        this.watcher = watcher;
-        gameThread = new Thread(this);
-        gameThread.start();
+        this.view = view;
+        this.status = Status.PLAYING;
     }
 
-    @Override
-    public void run() {
-        long lastSnakeMoveTime = 0;
-        while (true) {
-            if (System.currentTimeMillis() - lastSnakeMoveTime >= 100) {
-                lastSnakeMoveTime = System.currentTimeMillis();
-                snake.move();
-                enemies.updateStrategy();
-                enemies.stream().forEach(Snake::move);
-                watcher.updateFrame(grid, snake, enemies.stream().toList());
-                checkFoodCollision();
-                checkSnakeCollision();
-                checkWallCollision();
-                checkSnakeSize();
-            }
+    public void nextFrame() {
+        if (status != Status.PLAYING)
+            return;
 
-            try {
-                TimeUnit.MILLISECONDS.sleep(1);
-            } catch (InterruptedException e) {
-                break;
-            }
-        }
-    }
+        // Player's snake logic
+        player.move();
+        checkFoodCollision(player);
+        checkPlayerWallCollision(player);
+        checkPlayerSelfCollision(player);
+        checkKill(player, enemies);
+        checkCut(player, enemies);
+        checkPlayerSize(player);
 
-    public void end() {
-        gameThread.interrupt();
-        while (gameThread.isAlive()) {
-            try {
-                gameThread.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+        // Enemies snakes logic
+        enemies.updateStrategy(player);
+        enemies.stream().forEach(Snake::move);
+        checkKill(player, enemies);
+        checkCut(player, enemies);
+        enemies.stream().forEach(this::checkFoodCollision);
+        enemies.stream().forEach(this::checkEnemyWallCollision);
+        enemies.stream().forEach(this::checkEnemySelfCollision);
+        enemies.stream().forEach(this::checkPlayerCollision);
+        enemies.stream().forEach(enemy -> checkKill(enemy, enemies));
+        enemies.stream().forEach(enemy -> checkCut(enemy, enemies));
+
+        Frame frame = new Frame(grid, player, enemies.stream().toList(), status);
+        view.updateFrame(frame);
     }
 
     public void turn(Direction direction) {
-        snake.turn(direction);
+        player.turn(direction);
     }
 
     private void gameOver() {
-        watcher.gameOver();
-        gameThread.interrupt();
+        status = Status.LOSE;
     }
 
     private void gameWin() {
-        watcher.gameWin();
-        gameThread.interrupt();
+        status = Status.WIN;
     }
 
-    private void checkFoodCollision() {
-        Cell headCell = snake.head();
-        if (headCell.getType() == Cell.Type.FOOD) {
+    private void checkFoodCollision(Snake snake) {
+        Cell head = snake.head();
+        if (head.getType() == Cell.Type.FOOD) {
             snake.grow();
-            grid.exchangeCellType(headCell.getRow(), headCell.getCol(), Cell.Type.EMPTY);
+            grid.exchangeCellType(head.getRow(), head.getCol(), Cell.Type.EMPTY);
             grid.addFood(1);
         }
     }
 
-    private void checkSnakeCollision() {
-        Cell headCell = snake.head();
-        snake.stream().forEach(bodyCell -> {
-            System.out.println(bodyCell);
-            if (bodyCell.isIntersect(headCell) && bodyCell != headCell) {
-                gameOver();
-            }
-        });
-    }
-
-    private void checkWallCollision() {
-        Cell headCell = snake.head();
-        if (headCell.getType() == Cell.Type.WALL) {
+    private void checkPlayerWallCollision(Snake player) {
+        if (player.head().getType() == Cell.Type.WALL)
             gameOver();
-        }
     }
 
-    private void checkSnakeSize() {
-        if (snake.size() >= winSize) {
+    private void checkEnemyWallCollision(Snake enemy) {
+        if (enemy.head().getType() == Cell.Type.WALL)
+            enemies.remove(enemy);
+    }
+
+    private void checkPlayerSelfCollision(Snake player) {
+        int headOccurrences = Collections.frequency(player.stream().toList(), player.head());
+        if (headOccurrences > 1)
+            gameOver();
+    }
+
+    private void checkEnemySelfCollision(Snake enemy) {
+        long headOccurrences = enemy.stream().filter(cell -> cell.isIntersect(enemy.head())).count();
+        if (headOccurrences > 1)
+            enemies.remove(enemy);
+    }
+
+    private void checkKill(Snake snake, Enemies enemies) {
+        enemies.stream().filter(enemy -> enemy.head().isIntersect(snake.head()) && enemy != snake).forEach(enemies::remove);
+    }
+
+    private void checkCut(Snake snake, Enemies enemies) {
+        Cell head = snake.head();
+        enemies.stream().filter(enemy -> enemy.stream().anyMatch(head::isIntersect) && enemy.head() != head).forEach(enemy -> enemy.cut(head));
+    }
+
+    private void checkPlayerSize(Snake player) {
+        if (player.size() >= winSize)
             gameWin();
-        }
+    }
+
+    private void checkPlayerCollision(Snake enemy) {
+        Cell head = enemy.head();
+        boolean isIntersect = player.stream().anyMatch(cell -> head.isIntersect(cell) && !player.head().isIntersect(cell));
+        if (isIntersect)
+            player.cut(head);
     }
 }
