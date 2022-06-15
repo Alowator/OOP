@@ -1,4 +1,4 @@
-package ru.nsu.alowator.core;
+package ru.nsu.alowator.core.entities;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -38,7 +38,6 @@ public class Grid {
 
     public void addWall(int wallCount) {
         while (wallCount > 0 && !emptyCells.isEmpty()) {
-            int wallCellsCount = 5;
             Cell nextWalCell = getRandomFreeCell();
             exchangeCellType(nextWalCell.getRow(), nextWalCell.getCol(), Cell.Type.WALL);
             wallCount -= 1;
@@ -74,5 +73,16 @@ public class Grid {
 
     public Stream<Cell> stream() {
         return Arrays.stream(cells).flatMap(Arrays::stream);
+    }
+
+    public List<Cell> adjacentCells(Cell cell) {
+        List<Cell> result = new ArrayList<>();
+
+        result.add(cells[(rowCount + cell.getRow() - 1) % rowCount][cell.getCol()]);
+        result.add(cells[(cell.getRow() + 1) % rowCount][cell.getCol()]);
+        result.add(cells[cell.getRow()][(colCount + cell.getCol() - 1) % colCount]);
+        result.add(cells[cell.getRow()][(cell.getCol() + 1) % colCount]);
+
+        return result;
     }
 }

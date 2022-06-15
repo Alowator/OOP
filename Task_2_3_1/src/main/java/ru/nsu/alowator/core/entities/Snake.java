@@ -1,7 +1,4 @@
-package ru.nsu.alowator.core.snake;
-
-import ru.nsu.alowator.core.Cell;
-import ru.nsu.alowator.core.Grid;
+package ru.nsu.alowator.core.entities;
 
 import java.util.LinkedList;
 import java.util.stream.Stream;
@@ -12,7 +9,6 @@ public class Snake {
     private Direction direction;
     private Direction directionOrder;
     private int growthPotential;
-
 
     public Snake(Grid grid) {
         this.grid = grid;
@@ -66,5 +62,12 @@ public class Snake {
 
     public Stream<Cell> stream() {
         return snakeBody.stream();
+    }
+
+    public void cut(Cell cutCell) {
+        Cell cell = snakeBody.removeFirst();
+        while (!cell.isIntersect(cutCell)) {
+            cell = snakeBody.removeFirst();
+        }
     }
 }

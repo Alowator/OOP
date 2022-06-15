@@ -4,9 +4,12 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 
 import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
 
 
 public class Settings {
+    @FXML public BorderPane rootPane;
     @FXML public TextField rowTextField;
     @FXML public TextField colTextField;
     @FXML public TextField foodTextField;
@@ -19,8 +22,8 @@ public class Settings {
     private int colCount = 40;
     private int foodCount = 30;
     private int wallCount = 30;
-    private int enemiesCount = 0;
-    private int winSize = 150;
+    private int enemiesCount = 5;
+    private int winSize = 25;
 
     public void initialize() {
         rowTextField.setText(String.valueOf(rowCount));
@@ -38,6 +41,8 @@ public class Settings {
         wallCount = Integer.parseInt(wallTextField.getText().replaceAll("[^\\d]", ""));
         enemiesCount = Integer.parseInt(enemiesTextField.getText().replaceAll("[^\\d]", ""));
         winSize = Integer.parseInt(winScoreTextField.getText().replaceAll("[^\\d]", ""));
+        Stage stage = (Stage) rootPane.getScene().getWindow();
+        stage.close();
     }
 
     public int getRowCount() {

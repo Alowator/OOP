@@ -1,9 +1,9 @@
-package ru.nsu.alowator.core;
+package ru.nsu.alowator.core.entities;
 
 public class Cell {
     private final int row;
     private final int col;
-    private Type type;
+    private final Type type;
 
     public enum Type {
         EMPTY,
